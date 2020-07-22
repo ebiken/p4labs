@@ -72,15 +72,6 @@ $ sudo simple_switch_grpc --no-p4 -i 1@p1 --log-console -L trace \
 4. Run bmv2-host_agent.go
 
 ```
-> prerequisits
-> intall go
-$ go get google.golang.org/grpc
-$ go get github.com/p4lang/p4runtime/go/p4/v1
-$ go get github.com/p4lang/p4runtime/go/p4/config/v1
-$ go get github.com/golang/protobuf/proto
-$ go get github.com/pkg/errors
-$ go get github.com/vishvananda/netlink
-
 > run 
 $ sudo go run agent.go
 ```
