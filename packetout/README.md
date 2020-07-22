@@ -58,15 +58,8 @@ tcpdump: listening on vtap1, link-type EN10MB (Ethernet), capture size 262144 by
 5. Send Packet by running the Control Plane agent
 
 ```
-> prerequisits
-> intall go
-$ go get google.golang.org/grpc
-$ go get github.com/p4lang/p4runtime/go/p4/v1
-$ go get github.com/p4lang/p4runtime/go/p4/config/v1
-$ go get github.com/golang/protobuf/proto
-$ go get github.com/pkg/errors
-
 > run agent to send packet out
+
 $ go run bmv2-agent.go
 ```
 

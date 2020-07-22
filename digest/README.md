@@ -44,15 +44,8 @@ $ sudo simple_switch_grpc --no-p4 -i 1@vtap1 --log-console -L trace \
 4. Run p4digest_agent
 
 ```
-> prerequisits
-> intall go
-$ go get google.golang.org/grpc
-$ go get github.com/p4lang/p4runtime/go/p4/v1
-$ go get github.com/p4lang/p4runtime/go/p4/config/v1
-$ go get github.com/golang/protobuf/proto
-$ go get github.com/pkg/errors
-
 > run p4digest_agent
+
 $ go run p4digest_agent.go
  ... snip ...
 2020/06/28 10:55:52 Start loop to receive digest
