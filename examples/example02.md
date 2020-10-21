@@ -35,129 +35,175 @@ sudo go run example02.go
 mirroring_add 0 192
 
 > Send any packt to any port, and the packet will be cloned to CPU and also sent out from port#2.
-sudo ip netns exec host1 ping 172.20.0.2
+> Below script will send UDP from veth1 using scapy.
+~/p4labs/tools$ sudo ip netns exec host1 ./send-udp.py
 ```
 
 ## Result
 
 ```
 > clone will happen at the end of Ingress Pipeline
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Pipeline 'ingress': end
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Cloning packet at ingress
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Pipeline 'ingress': end
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Cloning packet at ingress
 
-> sorted per cloned[0.1] packet and the original packet[0.0]
+> sorted per cloned packet[0.1] and the original packet[0.0]
 
 > Original packet will be sent to the port specified by egress_spec (2)
 > instance_type is 0 (BMV2_V1MODEL_INSTANCE_TYPE_NORMAL)
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Cloning packet to egress port 192
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Egress port is 2
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Pipeline 'egress': start
-[10:56:02.397] [bmv2] [T] [thread 36120] [0.0] [cxt 0] Applying table 'SwitchEgress.egress_table_1'
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Looking up key:
+> Condition "st_md.egress_port == 9w192" is false, so packet_in header would not be set valid.
+> Deparsing only 'ethernet' header.
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Cloning packet to egress port 192
+[11:15:02.864] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Egress port is 2
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Pipeline 'egress': start
+[11:15:02.864] [bmv2] [T] [thread 40664] [0.0] [cxt 0] example02.p4(177) Condition "st_md.egress_port == 9w192" (node_8) is false
+
+[11:15:02.864] [bmv2] [T] [thread 40664] [0.0] [cxt 0] Applying table 'SwitchEgress.egress_table_1'
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Looking up key:
 * st_md.ingress_port  : 0001
 * st_md.instance_type : 00000000
 * st_md.egress_port   : 0002
+
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Table 'SwitchEgress.egress_table_1': miss
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Action entry is NoAction -
+[11:15:02.864] [bmv2] [T] [thread 40664] [0.0] [cxt 0] Action NoAction
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Pipeline 'egress': end
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Deparser 'deparser': start
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Deparsing header 'ethernet'
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Deparser 'deparser': end
+[11:15:02.865] [bmv2] [D] [thread 40666] [0.0] [cxt 0] Transmitting packet of size 50 out of port 2
+
 
 > cloned packet will first go through IngressParser
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Parser 'parser': start
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Parser 'parser' entering state 'start'
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Extracting header 'ethernet'
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Parser state 'start' has no switch, going to default next state
-[10:56:02.396] [bmv2] [T] [thread 36117] [0.1] [cxt 0] Bytes parsed: 14
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Parser 'parser': end
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Parser 'parser': start
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Parser 'parser' entering state 'start'
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Extracting header 'ethernet'
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Parser state 'start' has no switch, going to default next state
+[11:15:02.863] [bmv2] [T] [thread 40661] [0.1] [cxt 0] Bytes parsed: 14
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Parser 'parser': end
 > Then move to Egress Pipeline (skip Ingress)
+> Condition "st_md.egress_port == 9w192" is true, so packet_in header would be set valid.
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Pipeline 'egress': start
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(177) Condition "st_md.egress_port == 9w192" (node_8) is true
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] Applying table 'tbl_example02l178'
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Looking up key:
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Table 'tbl_example02l178': miss
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Action entry is example02l178 -
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] Action example02l178
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(178) Primitive hdr.packet_in.setValid()
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(179) Primitive hdr.packet_in.ingress_port = ((PortIdP4Runtime_t)(st_md.ingress_port)
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(180) Primitive hdr.packet_in.is_clone = 0
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(181) Primitive hdr.packet_in.padding = 0
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] Applying table 'SwitchEgress.egress_table_1'
 > egress_port will be 00c0 (192, CPU_PORT)
 > instance_type is 1 (BMV2_V1MODEL_INSTANCE_TYPE_INGRESS_CLONE)
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Pipeline 'egress': start
-[10:56:02.397] [bmv2] [T] [thread 36118] [0.1] [cxt 0] Applying table 'SwitchEgress.egress_table_1'
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Looking up key:
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Looking up key:
 * st_md.ingress_port  : 0001
 * st_md.instance_type : 00000001
 * st_md.egress_port   : 00c0
+> Deparsing 'packet_in' header before 'ethernet' header.
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Pipeline 'egress': end
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Deparser 'deparser': start
+[11:15:02.865] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Deparsing header 'packet_in'
+[11:15:02.865] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Deparsing header 'ethernet'
+[11:15:02.865] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Deparser 'deparser': end
+[11:15:02.865] [bmv2] [D] [thread 40666] [0.1] [cxt 0] Transmitting packet of size 53 out of port 192
+[11:15:02.865] [bmv2] [D] [thread 40666] Transmitting packet-in
 ```
 
-## BMv2 LOG
+## BMv2 RAW LOG
 
 ```bash
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Processing packet received on port 1
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Parser 'parser': start
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Parser 'parser' entering state 'start'
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Extracting header 'ethernet'
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Parser state 'start' has no switch, going to default next state
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] Bytes parsed: 14
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Parser 'parser': end
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Pipeline 'ingress': start
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] Applying table 'tbl_example02l158'
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Looking up key:
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Processing packet received on port 1
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Parser 'parser': start
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Parser 'parser' entering state 'start'
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Extracting header 'ethernet'
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Parser state 'start' has no switch, going to default next state
+[11:15:02.862] [bmv2] [T] [thread 40661] [0.0] [cxt 0] Bytes parsed: 14
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Parser 'parser': end
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Pipeline 'ingress': start
+[11:15:02.862] [bmv2] [T] [thread 40661] [0.0] [cxt 0] Applying table 'tbl_example02l154'
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Looking up key:
 
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Table 'tbl_example02l158': miss
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Action entry is example02l158 -
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] Action example02l158
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] example02.p4(158) Primitive mark_to_drop(st_md)
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] Applying table 'SwitchIngress.ingress_table_1'
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Looking up key:
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Table 'tbl_example02l154': miss
+[11:15:02.862] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Action entry is example02l154 -
+[11:15:02.862] [bmv2] [T] [thread 40661] [0.0] [cxt 0] Action example02l154
+[11:15:02.862] [bmv2] [T] [thread 40661] [0.0] [cxt 0] example02.p4(154) Primitive mark_to_drop(st_md)
+[11:15:02.862] [bmv2] [T] [thread 40661] [0.0] [cxt 0] Applying table 'SwitchIngress.ingress_table_1'
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Looking up key:
 * st_md.ingress_port  : 0001
 * st_md.instance_type : 00000000
 
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Table 'SwitchIngress.ingress_table_1': miss
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Action entry is SwitchIngress.do_clone3_i2e -
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] Action SwitchIngress.do_clone3_i2e
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] example02.p4(122) Primitive clone3(CloneType.I2E, I2E_CLONE_SESSION_ID, st_md)
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] Applying table 'tbl_example02l160'
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Looking up key:
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Table 'SwitchIngress.ingress_table_1': miss
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Action entry is SwitchIngress.do_clone3_i2e -
+[11:15:02.863] [bmv2] [T] [thread 40661] [0.0] [cxt 0] Action SwitchIngress.do_clone3_i2e
+[11:15:02.863] [bmv2] [T] [thread 40661] [0.0] [cxt 0] example02.p4(118) Primitive clone3(CloneType.I2E, I2E_CLONE_SESSION_ID, st_md)
+[11:15:02.863] [bmv2] [T] [thread 40661] [0.0] [cxt 0] Applying table 'tbl_example02l156'
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Looking up key:
 
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Table 'tbl_example02l160': miss
-[10:56:02.395] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Action entry is example02l160 -
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] Action example02l160
-[10:56:02.395] [bmv2] [T] [thread 36117] [0.0] [cxt 0] example02.p4(160) Primitive st_md.egress_spec = 2
-[10:56:02.396] [bmv2] [T] [thread 36117] [0.0] [cxt 0] Applying table 'SwitchIngress.ingress_table_2'
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Looking up key:
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Table 'tbl_example02l156': miss
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Action entry is example02l156 -
+[11:15:02.863] [bmv2] [T] [thread 40661] [0.0] [cxt 0] Action example02l156
+[11:15:02.863] [bmv2] [T] [thread 40661] [0.0] [cxt 0] example02.p4(156) Primitive st_md.egress_spec = 2
+[11:15:02.863] [bmv2] [T] [thread 40661] [0.0] [cxt 0] Applying table 'SwitchIngress.ingress_table_2'
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Looking up key:
 * st_md.ingress_port  : 0001
 * st_md.instance_type : 00000000
 
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Table 'SwitchIngress.ingress_table_2': miss
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Action entry is NoAction -
-[10:56:02.396] [bmv2] [T] [thread 36117] [0.0] [cxt 0] Action NoAction
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Pipeline 'ingress': end
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Cloning packet at ingress
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Parser 'parser': start
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Parser 'parser' entering state 'start'
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Extracting header 'ethernet'
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Parser state 'start' has no switch, going to default next state
-[10:56:02.396] [bmv2] [T] [thread 36117] [0.1] [cxt 0] Bytes parsed: 14
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.1] [cxt 0] Parser 'parser': end
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Cloning packet to egress port 192
-[10:56:02.396] [bmv2] [D] [thread 36117] [0.0] [cxt 0] Egress port is 2
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Pipeline 'egress': start
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Pipeline 'egress': start
-[10:56:02.397] [bmv2] [T] [thread 36118] [0.1] [cxt 0] Applying table 'SwitchEgress.egress_table_1'
-[10:56:02.397] [bmv2] [T] [thread 36120] [0.0] [cxt 0] Applying table 'SwitchEgress.egress_table_1'
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Looking up key:
-* st_md.ingress_port  : 0001
-* st_md.instance_type : 00000001
-* st_md.egress_port   : 00c0
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Table 'SwitchIngress.ingress_table_2': miss
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Action entry is NoAction -
+[11:15:02.863] [bmv2] [T] [thread 40661] [0.0] [cxt 0] Action NoAction
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Pipeline 'ingress': end
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Cloning packet at ingress
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Parser 'parser': start
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Parser 'parser' entering state 'start'
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Extracting header 'ethernet'
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Parser state 'start' has no switch, going to default next state
+[11:15:02.863] [bmv2] [T] [thread 40661] [0.1] [cxt 0] Bytes parsed: 14
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.1] [cxt 0] Parser 'parser': end
+[11:15:02.863] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Cloning packet to egress port 192
+[11:15:02.864] [bmv2] [D] [thread 40661] [0.0] [cxt 0] Egress port is 2
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Pipeline 'egress': start
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Pipeline 'egress': start
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(177) Condition "st_md.egress_port == 9w192" (node_8) is true
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] Applying table 'tbl_example02l178'
+[11:15:02.864] [bmv2] [T] [thread 40664] [0.0] [cxt 0] example02.p4(177) Condition "st_md.egress_port == 9w192" (node_8) is false
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Looking up key:
 
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Looking up key:
+[11:15:02.864] [bmv2] [T] [thread 40664] [0.0] [cxt 0] Applying table 'SwitchEgress.egress_table_1'
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Table 'tbl_example02l178': miss
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Action entry is example02l178 -
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] Action example02l178
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(178) Primitive hdr.packet_in.setValid()
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Looking up key:
 * st_md.ingress_port  : 0001
 * st_md.instance_type : 00000000
 * st_md.egress_port   : 0002
 
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Table 'SwitchEgress.egress_table_1': miss
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Table 'SwitchEgress.egress_table_1': miss
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Action entry is NoAction -
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Action entry is NoAction -
-[10:56:02.397] [bmv2] [T] [thread 36118] [0.1] [cxt 0] Action NoAction
-[10:56:02.397] [bmv2] [T] [thread 36120] [0.0] [cxt 0] Action NoAction
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Pipeline 'egress': end
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Pipeline 'egress': end
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Deparser 'deparser': start
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Deparser 'deparser': start
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Deparsing header 'ethernet'
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Deparsing header 'ethernet'
-[10:56:02.397] [bmv2] [D] [thread 36118] [0.1] [cxt 0] Deparser 'deparser': end
-[10:56:02.397] [bmv2] [D] [thread 36120] [0.0] [cxt 0] Deparser 'deparser': end
-[10:56:02.397] [bmv2] [D] [thread 36122] [0.1] [cxt 0] Transmitting packet of size 42 out of port 192
-[10:56:02.397] [bmv2] [D] [thread 36122] Transmitting packet-in
-PACKET IN
-[10:56:02.398] [bmv2] [D] [thread 36122] [0.0] [cxt 0] Transmitting packet of size 42 out of port 2
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(179) Primitive hdr.packet_in.ingress_port = ((PortIdP4Runtime_t)(st_md.ingress_port)
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Table 'SwitchEgress.egress_table_1': miss
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(180) Primitive hdr.packet_in.is_clone = 0
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Action entry is NoAction -
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] example02.p4(181) Primitive hdr.packet_in.padding = 0
+[11:15:02.864] [bmv2] [T] [thread 40664] [0.0] [cxt 0] Action NoAction
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] Applying table 'SwitchEgress.egress_table_1'
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Pipeline 'egress': end
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Deparser 'deparser': start
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Looking up key:
+* st_md.ingress_port  : 0001
+* st_md.instance_type : 00000001
+* st_md.egress_port   : 00c0
+
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Deparsing header 'ethernet'
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Table 'SwitchEgress.egress_table_1': miss
+[11:15:02.864] [bmv2] [D] [thread 40664] [0.0] [cxt 0] Deparser 'deparser': end
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Action entry is NoAction -
+[11:15:02.864] [bmv2] [T] [thread 40662] [0.1] [cxt 0] Action NoAction
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Pipeline 'egress': end
+[11:15:02.864] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Deparser 'deparser': start
+[11:15:02.865] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Deparsing header 'packet_in'
+[11:15:02.865] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Deparsing header 'ethernet'
+[11:15:02.865] [bmv2] [D] [thread 40666] [0.0] [cxt 0] Transmitting packet of size 50 out of port 2
+[11:15:02.865] [bmv2] [D] [thread 40662] [0.1] [cxt 0] Deparser 'deparser': end
+[11:15:02.865] [bmv2] [D] [thread 40666] [0.1] [cxt 0] Transmitting packet of size 53 out of port 192
+[11:15:02.865] [bmv2] [D] [thread 40666] Transmitting packet-in
 ```
