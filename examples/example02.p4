@@ -177,7 +177,11 @@ control SwitchEgress(
         if (st_md.egress_port == CPU_PORT) {
             hdr.packet_in.setValid();
             hdr.packet_in.ingress_port = BMV2_PORTID_TO_P4RT(st_md.ingress_port);
-            hdr.packet_in.is_clone = 0;
+            if (IS_I2E_CLONE(st_md) || IS_E2E_CLONE(st_md)) {
+                hdr.packet_in.is_clone = 1;
+            } else {
+                hdr.packet_in.is_clone = 0;
+            }
             hdr.packet_in.padding = 0;
         }
         egress_table_1.apply();
