@@ -112,10 +112,6 @@ control SwitchIngress(
     // Action
     action send_to_cpu() {
         st_md.egress_spec = CPU_PORT;
-        hdr.packet_in.setValid();
-        hdr.packet_in.ingress_port = BMV2_PORTID_TO_P4RT(st_md.ingress_port);
-        hdr.packet_in.is_clone = 0;
-        hdr.packet_in.padding = 0;
     }
     action do_clone3_i2e() {
         //st_md.egress_spec = 2;
@@ -178,6 +174,12 @@ control SwitchEgress(
         const default_action = NoAction;
     }
     apply {
+        if (st_md.egress_port == CPU_PORT) {
+            hdr.packet_in.setValid();
+            hdr.packet_in.ingress_port = BMV2_PORTID_TO_P4RT(st_md.ingress_port);
+            hdr.packet_in.is_clone = 0;
+            hdr.packet_in.padding = 0;
+        }
         egress_table_1.apply();
     }
 }
